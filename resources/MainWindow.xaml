@@ -1,0 +1,1230 @@
+﻿<Window x:Class="adgui.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:adgui"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        Title="Active Directory User Administration Tool" Height="800" Width="1600"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesign.Brush.Background}"
+        FontFamily="{materialDesign:MaterialDesignFont}">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Base theme -->
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
+
+                <!-- Color scheme -->
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Secondary/MaterialDesignColor.LightBlue.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar -->
+        <Border Grid.Column="0" Background="#2E3440">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- App Header -->
+                <StackPanel Grid.Row="0" Margin="20,30,20,10">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Image x:Name="mdLogo" Source="media/logo.png" Height="40" VerticalAlignment="Center" Width="50"/>
+                        <TextBlock Text="AD User Admin" FontSize="24" FontWeight="Light" 
+                                   Foreground="White" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Domain dropdown -->
+                <ComboBox x:Name="cbDomain" Grid.Row="1" Margin="0,10,0,20" SelectedIndex="0"
+                     HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                     VerticalContentAlignment="Center" FontSize="16" Foreground="White">
+                     <ComboBox.ItemContainerStyle>
+                        <Style TargetType="{x:Type ComboBoxItem}">
+                            <Setter Property="Foreground" Value="Black" />
+                        </Style>
+                    </ComboBox.ItemContainerStyle>
+                </ComboBox>
+
+                <!-- Navigation Buttons -->
+                <StackPanel Grid.Row="2" Margin="10,0,10,0">
+                    <Button x:Name="btnDashboard" 
+                            Style="{StaticResource MaterialDesignFlatButton}"
+                            Height="50" HorizontalContentAlignment="Left"
+                            Padding="15,0,0,0" Margin="0,0,0,5"
+                            Foreground="White">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="ViewDashboard" Width="24" Height="24" 
+                                                     VerticalAlignment="Center" Margin="0,0,15,0"/>
+                            <TextBlock Text="Dashboard" FontSize="16" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button x:Name="btnUsers" 
+                            Style="{StaticResource MaterialDesignFlatButton}"
+                            Height="50" HorizontalContentAlignment="Left"
+                            Padding="15,0,0,0" Margin="0,0,0,5"
+                            Foreground="White">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="accountmultiple" Width="24" Height="24" 
+                                                     VerticalAlignment="Center" Margin="0,0,15,0"/>
+                            <TextBlock Text="User Management" FontSize="16" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button x:Name="btnSync" 
+                            Style="{StaticResource MaterialDesignFlatButton}"
+                            Height="50" HorizontalContentAlignment="Left"
+                            Padding="15,0,0,0" Margin="0,0,0,5"
+                            Foreground="White">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="cloudsync" Width="24" Height="24" 
+                                                     VerticalAlignment="Center" Margin="0,0,15,0"/>
+                            <TextBlock Text="Entra Connect Sync" FontSize="16" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button x:Name="btnUtilities" 
+                        Style="{StaticResource MaterialDesignFlatButton}"
+                        Height="50" HorizontalContentAlignment="Left"
+                        Padding="15,0,0,0" Margin="0,0,0,5"
+                        Foreground="White">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="ApplicationCogOutline" Width="24" Height="24" 
+             VerticalAlignment="Center" Margin="0,0,15,0"/>
+                            <TextBlock Text="Utilities" FontSize="16" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    
+                    <Button x:Name="btnAdmin" 
+                            Style="{StaticResource MaterialDesignFlatButton}"
+                            Height="50" HorizontalContentAlignment="Left"
+                            Padding="15,0,0,0" Margin="0,0,0,5"
+                            Foreground="White">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="accountcowboyhat" Width="24" Height="24" 
+                                                     VerticalAlignment="Center" Margin="0,0,15,0"/>
+                            <TextBlock Text="Admin" FontSize="16" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main content -->
+        <Grid Grid.Column="1">
+
+            <!-- Dashboard Page -->
+            <Grid x:Name="dashboardPage" Visibility="Visible">
+                <StackPanel Margin="30">
+                    <TextBlock x:Name="dbPageHeader" Text="Dashboard" 
+                               Style="{StaticResource MaterialDesignHeadline4TextBlock}"
+                               Margin="0,0,0,5"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Logged in as: " Foreground="Gray" FontSize="16"/>
+                        <TextBlock x:Name="dbAdminName" Foreground="Gray" FontSize="16"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="20,20,0,0">
+                        <TextBlock Text="Known Issues: " FontSize="24" Margin="0,0,0,10"/>
+                        <TextBlock Text="   - Department field not updating to correct department - case sensitivity + wrong department name on AD causes mismatch, making field not populate" FontSize="16"/>
+                        <TextBlock Text="       Temp solution: Set the department to the correct one in the dropdown" FontSize="16"/>
+                        <TextBlock Text="" FontSize="16"/>
+                        <TextBlock Text="   - Can Guan" FontSize="16"/>
+                        <TextBlock Text="       Solution: Can Guan" FontSize="16"/>
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
+
+            <!-- Users Page -->
+            <Grid x:Name="usersPage" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <TextBlock Grid.Row="0" Text="User Management"
+                           Style="{StaticResource MaterialDesignHeadline4TextBlock}"
+                           Margin="30,30,30,20"/>
+                
+                <!-- Search and Action Buttons -->
+                <materialDesign:Card Grid.Row="1" Margin="30,0,30,20" Padding="20">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <!-- Search Row -->
+                        <Grid Grid.Row="0" Margin="0,0,0,15">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <TextBox x:Name="txtUserSearch" Margin="0,0,20,0"
+                                materialDesign:HintAssist.Hint="Search by any property" Grid.Column="0"/>
+
+                            <Button x:Name="btnUserSearch" Grid.Column="1"
+                                    Style="{StaticResource MaterialDesignRaisedButton}" Background="#27187E"
+                                    Margin="0,0,10,0" Width="120">
+                                <Button.Content>
+                                    <StackPanel Orientation="Horizontal">
+                                        <materialDesign:PackIcon Kind="Magnify" Width="18" Height="18" 
+                                                                 VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                        <TextBlock Text="SEARCH" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Button.Content>
+                            </Button>
+                        </Grid>
+
+                        <!-- Action Buttons Row -->
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Button x:Name="btnCreateUser" Grid.Column="0"
+                                    Style="{StaticResource MaterialDesignRaisedButton}"
+                                    Margin="0,0,10,0" Width="150"
+                                    Background="#399E5A">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="AccountPlus" Width="20" Height="20" 
+                                                             VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Create User" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <Button x:Name="btnEditUser" Grid.Column="1"
+                                    Style="{StaticResource MaterialDesignRaisedButton}"
+                                    Margin="0,0,10,0" Width="130"
+                                    Background="#044B7F">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="AccountEdit" Width="20" Height="20" 
+                                                             VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Edit User" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <Button x:Name="btnImportCSV" Grid.Column="2"
+                                    Style="{StaticResource MaterialDesignRaisedButton}"
+                                    Width="240"
+                                    Background="#610345">
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="FileImport" Width="20" Height="20" 
+                                                             VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Import users from .CSV (WIP)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <TextBlock Grid.Column="3" x:Name="txtUserCount" 
+                                       Text="0 users found" 
+                                       VerticalAlignment="Center" 
+                                       HorizontalAlignment="Right"
+                                       Foreground="Gray"
+                                       Margin="15,0,0,0"/>
+                        </Grid>
+                    </Grid>
+                </materialDesign:Card>
+
+                <!-- User List -->
+                <DataGrid Grid.Row="2" x:Name="dgUserList" 
+                          Margin="30,0,30,30"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          CanUserAddRows="False"
+                          CanUserDeleteRows="False"
+                          SelectionMode="Single"
+                          HeadersVisibility="Column"
+                          GridLinesVisibility="Horizontal"
+                          AlternatingRowBackground="#F5F5F5"
+                          RowHeight="45">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Employee ID" Binding="{Binding employeeID}" Width="120"/>
+                        <DataGridTextColumn Header="sAM Account Name" Binding="{Binding SamAccountName}" Width="160"/>
+                        <DataGridTextColumn Header="Display Name" Binding="{Binding DisplayName}" Width="160"/>
+                        <DataGridTextColumn Header="Email" Binding="{Binding EmailAddress}" Width="250"/>
+                        <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="150"/>
+                        <DataGridTextColumn Header="Department" Binding="{Binding Department}" Width="130"/>
+                        <DataGridCheckBoxColumn Header="Enabled" Binding="{Binding Enabled}" Width="80"/>
+                        <DataGridTextColumn Header="Last Logon" Binding="{Binding LastLogonDate}" Width="180"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
+
+<!-- Create user page-->
+<Grid x:Name="createUserPage" Visibility="Collapsed" Background="White" Panel.ZIndex="100">
+    <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+
+    <materialDesign:Card Grid.Row="0" Margin="30,30,30,20" Padding="20">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Orientation="Vertical">
+                <Button x:Name="btnCreateToUserList" Grid.Column="0"
+            Style="{StaticResource MaterialDesignFlatButton}"
+            HorizontalAlignment="Left"
+            Padding="8">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="ArrowLeft" Width="24" Height="24" 
+                                    VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBlock Text="Back to User List" FontSize="14" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                <TextBlock Text="* Indicates required, fields left blank will be defaulted to hint displayed in field." 
+                        Style="{StaticResource MaterialDesignBodySmallTextBlock}" Foreground="Red"
+                        Margin="0,30,0,0"/>
+            </StackPanel>
+
+            <TextBlock Grid.Column="1" Text="Create New User" 
+           Style="{StaticResource MaterialDesignHeadline4TextBlock}"
+           VerticalAlignment="Center"
+           HorizontalAlignment="Center"/>
+        </Grid>
+    </materialDesign:Card>
+
+    <!-- User Creation Form -->
+    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+        <materialDesign:Card Margin="30,0,30,10" Padding="30,10,30,30">
+            <StackPanel>
+                <!-- Basic Information -->
+                <TextBlock Text="Basic Information" 
+                    Style="{StaticResource MaterialDesignHeadline5TextBlock}"
+                    Margin="0,0,0,20"/>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Grid.Column="0">
+                        <TextBlock Text="*Given Name" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtCreateUserGivenName" Margin="0,0,0,20"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="0" Grid.Column="2">
+                        <TextBlock Text="*Surname" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtCreateUserSurname" Margin="0,0,0,20"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Grid.Column="0">
+                        <TextBlock Text="Display Name" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtCreateUserDisplayName" Margin="0,0,0,20" materialDesign:HintAssist.Hint="givenname surname"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Grid.Column="2">
+                        <TextBlock Text="Email Address" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtCreateUserEmail" Margin="0,0,0,20" materialDesign:HintAssist.Hint="givenname.surname@domain"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2" Grid.Column="0">
+                        <TextBlock Text="sAMAccountName" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtCreateUserSamAccountName" Margin="0,0,0,20" materialDesign:HintAssist.Hint="givenname.surname"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2" Grid.Column="2">
+                        <TextBlock Text="Temp Password" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtCreateUserPassword" Margin="0,0,0,20" materialDesign:HintAssist.Hint="Leave blank for randomly generated password"/>
+                    </StackPanel>
+
+                </Grid>
+
+                <!-- Job Information -->
+                <TextBlock Text="Job Information" 
+               Style="{StaticResource MaterialDesignHeadline5TextBlock}"
+               Margin="0,20,0,20"/>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Grid.Column="0">
+                        <TextBlock Text="*Job Title" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtCreateUserTitle" Margin="0,0,0,20"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="0" Grid.Column="2">
+                        <TextBlock Text="*Department" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <ComboBox x:Name="cbCreateUserDepartment" Margin="0,0,0,20"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Grid.Column="0">
+                        <TextBlock Text="Location" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <ComboBox x:Name="cbCreateUserLocation" Margin="0,0,0,20" materialDesign:HintAssist.Hint="Winnipeg-150 Henry Ave"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Grid.Column="2">
+                        <TextBlock Text="*Reporting Manager sAMAccountName" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtManagerSamName" Margin="0,0,0,20" materialDesign:HintAssist.Hint="Format: givenname.surname"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2" Grid.Column="2">
+                        <TextBlock Text="*Budget Code" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtBudgetCode" Margin="0,0,0,20"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2" Grid.Column="0">
+                        <TextBlock Text="Office Phone" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtOfficePhone" Margin="0,0,0,20" materialDesign:HintAssist.Hint="Default number set according to chosen office location"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="3" Grid.Column="0">
+                        <TextBlock Text="*Employee ID" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtEmployeeID" Margin="0,0,0,20"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="3" Grid.Column="2">
+                        <TextBlock Text="*ADP Associate ID" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtADPID" Margin="0,0,0,20"/>
+                    </StackPanel>
+
+                </Grid>
+
+                <!-- Action Buttons -->
+                <Grid Margin="0,30,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button x:Name="btnSubmitCreateUser" Grid.Column="2"
+                Style="{StaticResource MaterialDesignRaisedButton}"
+                Width="160"
+                Background="#4CAF50">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Check" Width="20" Height="20" 
+                                         VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBlock Text="Create User" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </StackPanel>
+        </materialDesign:Card>
+    </ScrollViewer>
+</Grid>
+
+<!-- Edit user page -->
+<Grid x:Name="editUserPage" Visibility="Collapsed" Background="White" Panel.ZIndex="100">
+    <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+
+    <!-- Back Button -->
+    <materialDesign:Card Grid.Row="0" Margin="10" Padding="20">
+        <Button x:Name="btnEditToUserList"
+    Style="{StaticResource MaterialDesignFlatButton}"
+    HorizontalAlignment="Left"
+    Padding="8">
+            <StackPanel Orientation="Horizontal">
+                <materialDesign:PackIcon Kind="ArrowLeft" Width="24" Height="24" 
+                             VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <TextBlock Text="Back to User List" FontSize="14" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Button>
+    </materialDesign:Card>
+
+    <!-- User Header -->
+    <materialDesign:Card Grid.Row="1" Margin="30,0,30,20" Padding="10,0,10,10">
+        <StackPanel Orientation="Horizontal">
+            <Border Background="#2196F3" 
+        Width="80" Height="80" 
+        CornerRadius="40"
+        VerticalAlignment="Center"
+        Margin="0,0,20,0">
+                <materialDesign:PackIcon Kind="Account" 
+                             Width="50" Height="50"
+                             Foreground="White"
+                             HorizontalAlignment="Center"
+                             VerticalAlignment="Center"/>
+            </Border>
+
+            <!-- User Info -->
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock x:Name="txtEditHeaderDisplayName" 
+               Text="User Display Name"
+               Style="{StaticResource MaterialDesignHeadline4TextBlock}"
+               Margin="0,0,0,5"/>
+                <TextBlock x:Name="txtEditHeaderKey" 
+               Text="User Key"
+               FontSize="16"
+               Foreground="Gray"/>
+            </StackPanel>
+        </StackPanel>
+    </materialDesign:Card>
+
+    <!-- Edit User Form -->
+    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+        <materialDesign:Card Margin="30,0,30,30" Padding="30">
+            <StackPanel>
+                <!-- Basic Information -->
+                <TextBlock Text="Basic Information" 
+               Style="{StaticResource MaterialDesignHeadline5TextBlock}"
+               Margin="0,0,0,20"/>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Grid.Column="0">
+                        <TextBlock Text="Given Name" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtEditGivenName" Margin="0,0,0,20"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="0" Grid.Column="2">
+                        <TextBlock Text="Surname" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtEditSurname" Margin="0,0,0,20"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Grid.Column="0">
+                        <TextBlock Text="Display Name" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtEditDisplayName" Margin="0,0,0,20"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Grid.Column="2">
+                        <TextBlock Text="Email Address" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtEditEmail" Margin="0,0,0,20"/>
+                    </StackPanel>
+                
+                    <StackPanel Grid.Row="2" Grid.Column="0">
+                        <TextBlock Text="sAM Account Name" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtEditSamAccountName" Margin="0,0,0,20"/>
+                        
+                    </StackPanel>
+
+                <!-- Password Section -->
+                    <StackPanel Grid.Row="2" Grid.Column="2">
+                        <TextBlock Text="Password" 
+                                    FontSize="12" 
+                                    Foreground="#757575"
+                                    Margin="0,0,0,4"/>
+                        <Grid Margin="0,0,0,20">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <TextBox x:Name="txtEditUserPassword" 
+                                    Grid.Column="0"
+                                    Margin="0,0,5,0"/>
+                            <Button x:Name="btnEditRngPassword"
+                                    Grid.Column="1"
+                                    Background="Transparent"
+                                    BorderBrush="Transparent"
+                                    Width="40"
+                                    Height="20"
+                                    Padding="0"
+                                    Style="{StaticResource MaterialDesignIconButton}">
+                                <materialDesign:PackIcon Kind="Refresh" 
+                                                        Width="20" 
+                                                        Height="20"/>
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
+
+
+                <!-- Job Information -->
+                <TextBlock Text="Job Information" 
+               Style="{StaticResource MaterialDesignHeadline5TextBlock}"
+               Margin="0,20,0,20"/>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Grid.Column="0">
+                        <TextBlock Text="Job Title" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtEditTitle" Margin="0,0,0,20"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="0" Grid.Column="2">
+                        <TextBlock Text="Department" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <ComboBox x:Name="cbEditUserDepartment" Margin="0,0,0,20"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Grid.Column="0">
+                        <TextBlock Text="Location" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <ComboBox x:Name="cbEditUserLocation" Margin="0,0,0,20"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Grid.Column="2">
+                        <TextBlock Text="Phone Number" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtEditPhone" Margin="0,0,0,20"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2" Grid.Column="0">
+                        <TextBlock Text="Budget Code" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtEditBudgetCode" Margin="0,0,0,20"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Row="2" Grid.Column="2">
+                        <TextBlock Text="Reporting Manager sAMAccountName" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtEditManagerSamName" Margin="0,0,0,20"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="3" Grid.Column="0">
+                        <TextBlock Text="Employee ID (Unique Identifier)" 
+                                   FontSize="12" 
+                                   Foreground="Red"
+                                   Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtEditEmployeeID" Margin="0,0,0,20" IsReadOnly="True"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="3" Grid.Column="2">
+                        <TextBlock Text="ADP ID" 
+                                   FontSize="12" 
+                                   Foreground="#757575"
+                                   Margin="0,0,0,4"/>
+                        <TextBox x:Name="txtEditADPID" Margin="0,0,0,20"/>
+                    </StackPanel>
+
+                </Grid>
+
+                <!-- Account Status -->
+                <TextBlock Text="Account Status" 
+               Style="{StaticResource MaterialDesignHeadline5TextBlock}"
+               Margin="0,20,0,20"/>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <CheckBox x:Name="chkEditEnabled" Grid.Column="0"
+                  Content="Account Enabled"
+                  Margin="0,0,0,20"/>
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center"
+                            HorizontalAlignment="Right">
+                        <TextBlock Text="Last Login:" 
+                            Foreground="Gray"
+                            Margin="0,0,0,4"/>
+                        <TextBlock x:Name="txtEditLastLogon"
+                            Text=""
+                            Foreground="Gray"
+                            Margin="0,0,0,20"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Action Buttons -->
+                <Grid Margin="0,30,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button x:Name="btnSubmitEditUser" Grid.Column="2"
+                Style="{StaticResource MaterialDesignRaisedButton}"
+                Width="180"
+                Background="#2196F3">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="ContentSave" Width="20" Height="20" 
+                                         VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBlock Text="Save Changes" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </StackPanel>
+        </materialDesign:Card>
+    </ScrollViewer>
+</Grid>
+
+            <!-- Sync Page -->
+            <Grid x:Name="syncPage" Visibility="Collapsed">
+                <StackPanel Margin="30">
+                    <TextBlock x:Name="synPageHeader" Text="Entra Connect Sync" 
+                               Style="{StaticResource MaterialDesignHeadline4TextBlock}"
+                               Margin="0,0,0,20"/>
+                </StackPanel>
+                <Grid>
+                    <Button x:Name="btnDeltaSync" 
+                        Style="{StaticResource MaterialDesignRaisedButton}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Content="Delta Sync" />
+                </Grid>
+            </Grid>
+
+                        <!-- Utilities Page -->
+            <Grid x:Name="utilPage" Visibility="Collapsed">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="300"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <!-- Left Panel - Navigation -->
+                <Border Grid.Column="0" 
+            Background="#F5F5F5"
+            BorderBrush="#E0E0E0"
+            BorderThickness="0,0,1,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Header -->
+                        <Border Grid.Row="0" 
+                    Background="#2E3440"
+                    Padding="20,24"
+                    BorderBrush="#E0E0E0"
+                    BorderThickness="0,0,0,1">
+                            <TextBlock Text="Utilities" 
+                          Style="{StaticResource MaterialDesignHeadline5TextBlock}"
+                          Foreground="White"/>
+                        </Border>
+
+                        <!-- List of Utilities -->
+                        <ListBox x:Name="lsUtilList"
+                     Grid.Row="1"
+                     Background="Transparent"
+                     BorderThickness="0"
+                     Margin="0,8,0,8">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
+                                    <Setter Property="Padding" Value="8,4"/>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                        </ListBox>
+                    </Grid>
+                </Border>
+
+                <!-- Right Panel - Shows header only, actual content is in separate utility grids -->
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Content Header -->
+                    <Border Grid.Row="0" 
+                Background="White"
+                BorderBrush="#E0E0E0"
+                BorderThickness="0,0,0,1"
+                Padding="30,24">
+                        <StackPanel>
+                            <TextBlock x:Name="utilPageSelectedItem" 
+                          Text="Select a utility"
+                          Style="{StaticResource MaterialDesignHeadline4TextBlock}"/>
+                            <TextBlock x:Name="utilPageSubtitle"
+                          Text="Choose an option from the left panel"
+                          Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                          Foreground="#757575"
+                          Margin="0,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Field Normalisation Page -->
+                    <Grid x:Name="utilPageFieldNormalisation" Grid.Row="1" Visibility="Visible">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                 HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel Margin="0,20,20,20">
+
+                                <!-- Field Selection Section -->
+                                <Border Background="White"
+                    BorderBrush="#E0E0E0"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Padding="20"
+                    Margin="0,0,0,20">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+
+                                        <TextBlock Grid.Row="0" 
+                              Text="Step 1: Select Field to Normalize"
+                              Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                              Margin="0,0,0,15"/>
+
+                                        <Grid Grid.Row="1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="2*"/>
+                                                <ColumnDefinition Width="20"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <ComboBox x:Name="cbFieldSelection"
+                                 Grid.Column="0"
+                                 materialDesign:HintAssist.Hint="Select AD Field"
+                                 FontSize="14">
+                                                <ComboBoxItem Content="Department"/>
+                                                <ComboBoxItem Content="Title"/>
+                                                <ComboBoxItem Content="Office"/>
+                                                <ComboBoxItem Content="Company"/>
+                                                <ComboBoxItem Content="City"/>
+                                                <ComboBoxItem Content="State"/>
+                                                <ComboBoxItem Content="Country"/>
+                                            </ComboBox>
+
+                                            <Button x:Name="btnUtilLoadFieldValues"
+                               Grid.Column="2"
+                               Content="LOAD VALUES"
+                               Style="{StaticResource MaterialDesignRaisedButton}"
+                               Background="#2196F3"
+                               Height="40"/>
+                                        </Grid>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Main Content Area - Two Column Layout -->
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="20"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Left Panel - Field Values List -->
+                                    <Border Grid.Column="0"
+                        Background="White"
+                        BorderBrush="#E0E0E0"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Padding="20">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="*"/>
+                                            </Grid.RowDefinitions>
+
+                                            <TextBlock Grid.Row="0"
+                                  Text="Step 2: Select Value to Normalize"
+                                  Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                                  Margin="0,0,0,10"/>
+
+                                            <StackPanel Grid.Row="1" 
+                                   Orientation="Horizontal"
+                                   Margin="0,0,0,15">
+                                                <TextBlock x:Name="txtValueCount"
+                                      Text="0 unique values found"
+                                      FontSize="13"
+                                      Foreground="#757575"
+                                      VerticalAlignment="Center"/>
+                                                <materialDesign:PackIcon Kind="Information"
+                                                    Width="16"
+                                                    Height="16"
+                                                    Foreground="#2196F3"
+                                                    Margin="8,0,0,0"
+                                                    VerticalAlignment="Center"
+                                                    ToolTip="Select a value to see normalisation options"/>
+                                            </StackPanel>
+
+                                            <!-- DataGrid for Field Values -->
+                                            <DataGrid x:Name="dgFieldValues"
+                                 Grid.Row="2"
+                                 AutoGenerateColumns="False"
+                                 IsReadOnly="True"
+                                 CanUserAddRows="False"
+                                 CanUserDeleteRows="False"
+                                 SelectionMode="Single"
+                                 HeadersVisibility="Column"
+                                 GridLinesVisibility="Horizontal"
+                                 AlternatingRowBackground="#F5F5F5"
+                                 RowHeight="45"
+                                 MaxHeight="400">
+                                                <DataGrid.Columns>
+                                                    <DataGridTextColumn Header="Current Value" 
+                                                   Binding="{Binding Value}" 
+                                                   Width="*"/>
+                                                    <DataGridTextColumn Header="User Count" 
+                                                   Binding="{Binding Count}" 
+                                                   Width="100">
+                                                        <DataGridTextColumn.ElementStyle>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="HorizontalAlignment" Value="Center"/>
+                                                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                                                <Setter Property="Foreground" Value="#2196F3"/>
+                                                            </Style>
+                                                        </DataGridTextColumn.ElementStyle>
+                                                    </DataGridTextColumn>
+                                                </DataGrid.Columns>
+                                            </DataGrid>
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- Right Panel - Normalisation Action -->
+                                    <Border Grid.Column="2"
+                        Background="White"
+                        BorderBrush="#E0E0E0"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Padding="20">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="*"/>
+                                            </Grid.RowDefinitions>
+
+                                            <TextBlock Grid.Row="0"
+                                  Text="Step 3: Define New Value"
+                                  Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                                  Margin="0,0,0,20"/>
+
+                                            <!-- Current Value Display -->
+                                            <Border Grid.Row="1"
+                               Background="#FFF3E0"
+                               BorderBrush="#FFB74D"
+                               BorderThickness="1"
+                               CornerRadius="4"
+                               Padding="15"
+                               Margin="0,0,0,20">
+                                                <StackPanel>
+                                                    <TextBlock Text="Current Value:"
+                                          FontSize="12"
+                                          Foreground="#757575"
+                                          Margin="0,0,0,5"/>
+                                                    <TextBlock x:Name="txtCurrentValue"
+                                          Text="(Select a value from left)"
+                                          FontSize="16"
+                                          FontWeight="SemiBold"
+                                          TextWrapping="Wrap"/>
+                                                    <TextBlock x:Name="txtAffectedUsers"
+                                          Text=""
+                                          FontSize="12"
+                                          Foreground="#757575"
+                                          Margin="0,5,0,0"/>
+                                                </StackPanel>
+                                            </Border>
+
+                                            <!-- New Value Input -->
+                                            <StackPanel Grid.Row="2" Margin="0,0,0,20">
+                                                <TextBlock Text="New Value"
+                                      FontSize="12"
+                                      Foreground="#757575"
+                                      Margin="0,0,0,8"/>
+                                                <TextBox x:Name="txtNewValue"
+                                    materialDesign:HintAssist.Hint="Enter normalized value"
+                                    FontSize="14"/>
+                                            </StackPanel>
+
+                                            <!-- Mapping Memory Checkbox -->
+                                            <CheckBox x:Name="chkSaveMapping"
+                                 Grid.Row="3"
+                                 Content="Save this mapping for future automatic corrections"
+                                 IsChecked="True"
+                                 Margin="0,0,0,20"
+                                 FontSize="13">
+                                                <CheckBox.ToolTip>
+                                                    <TextBlock Text="When enabled, this correction will be saved and automatically applied to new users in scheduled tasks"
+                                          TextWrapping="Wrap"
+                                          MaxWidth="250"/>
+                                                </CheckBox.ToolTip>
+                                            </CheckBox>
+
+                                            <!-- Action Buttons -->
+                                            <StackPanel Grid.Row="4" 
+                                   VerticalAlignment="Bottom">
+                                                <!-- Apply Button -->
+                                                <Button x:Name="btnApplyNormalisation"
+                                   Style="{StaticResource MaterialDesignRaisedButton}"
+                                   Background="#4CAF50"
+                                   Height="45">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <materialDesign:PackIcon Kind="CheckCircle"
+                                                            Width="22"
+                                                            Height="22"
+                                                            VerticalAlignment="Center"
+                                                            Margin="0,0,8,0"/>
+                                                        <TextBlock Text="Apply Normalisation"
+                                              VerticalAlignment="Center"
+                                              FontSize="14"
+                                              FontWeight="SemiBold"/>
+                                                    </StackPanel>
+                                                </Button>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </Grid>
+
+                                <!-- Mapping History Section -->
+                                <Border Background="White"
+                    BorderBrush="#E0E0E0"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Padding="20"
+                    Margin="0,20,0,0">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="250"/>
+                                        </Grid.RowDefinitions>
+
+                                        <Grid Grid.Row="0" Margin="0,0,0,15">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Column="0"
+                                  Text="Saved Mappings (Auto-Applied)"
+                                  Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                                  VerticalAlignment="Center"/>
+
+                                            <Button x:Name="btnRefreshMappings"
+                               Grid.Column="1"
+                               Style="{StaticResource MaterialDesignFlatButton}"
+                               ToolTip="Refresh mapping list">
+                                                <materialDesign:PackIcon Kind="Refresh" Width="20" Height="20"/>
+                                            </Button>
+                                        </Grid>
+
+                                        <TextBlock Grid.Row="1"
+                              Text="These mappings are automatically applied during scheduled tasks"
+                              FontSize="12"
+                              Foreground="#757575"
+                              Margin="0,0,0,10"/>
+
+                                        <!-- Mapping DataGrid -->
+                                        <DataGrid x:Name="dgMappings"
+                             Grid.Row="2"
+                             AutoGenerateColumns="False"
+                             IsReadOnly="True"
+                             CanUserAddRows="False"
+                             CanUserDeleteRows="False"
+                             SelectionMode="Single"
+                             HeadersVisibility="Column"
+                             GridLinesVisibility="Horizontal"
+                             AlternatingRowBackground="#F5F5F5"
+                             RowHeight="40">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="Field" 
+                                               Binding="{Binding Field}" 
+                                               Width="150"/>
+                                                <DataGridTextColumn Header="Original Value" 
+                                               Binding="{Binding OriginalValue}" 
+                                               Width="*"/>
+                                                <DataGridTextColumn Header="Normalized Value" 
+                                               Binding="{Binding NormalizedValue}" 
+                                               Width="*"/>
+                                                <DataGridTextColumn Header="Date Created" 
+                                               Binding="{Binding DateCreated}" 
+                                               Width="140"/>
+                                                <DataGridTemplateColumn Header="Actions" Width="100">
+                                                    <DataGridTemplateColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <Button x:Name="btnDeleteMapping"
+                                               Style="{StaticResource MaterialDesignFlatButton}"
+                                               Foreground="#F44336"
+                                               ToolTip="Delete this mapping"
+                                               Padding="8,4">
+                                                                <materialDesign:PackIcon Kind="Delete" Width="18" Height="18"/>
+                                                            </Button>
+                                                        </DataTemplate>
+                                                    </DataGridTemplateColumn.CellTemplate>
+                                                </DataGridTemplateColumn>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Status Bar -->
+                                <Border Background="#E3F2FD"
+                    BorderBrush="#2196F3"
+                    BorderThickness="1,1,1,3"
+                    CornerRadius="4"
+                    Padding="15,10"
+                    Margin="0,20,0,0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <materialDesign:PackIcon Grid.Column="0"
+                                            Kind="InformationOutline"
+                                            Width="20"
+                                            Height="20"
+                                            Foreground="#2196F3"
+                                            VerticalAlignment="Center"
+                                            Margin="0,0,10,0"/>
+
+                                        <TextBlock x:Name="txtStatus"
+                              Grid.Column="1"
+                              Text="Ready. Select a field to begin normalisation."
+                              FontSize="13"
+                              Foreground="#1976D2"
+                              VerticalAlignment="Center"/>
+                                    </Grid>
+                                </Border>
+
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+
+
+                    <!-- GUID Converter Page (example for your next utility) -->
+                    <Grid x:Name="utilPageGUIDConverter" Grid.Row="1" Visibility="Collapsed">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="30">
+                                <TextBlock Text="WIP" FontSize="16"/>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+
+                </Grid>
+            </Grid>
+
+            <!-- Admin Page -->
+            <Grid x:Name="adminPage" Visibility="Collapsed">
+                <StackPanel Margin="30">
+                    <TextBlock x:Name="admPageHeader" Text="Admin" 
+                               Style="{StaticResource MaterialDesignHeadline4TextBlock}"
+                               Margin="0,0,0,20"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="WIP" FontSize="32" />
+                </StackPanel>
+            </Grid>
+
+        </Grid>
+    </Grid>
+</Window>
